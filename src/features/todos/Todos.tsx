@@ -3,11 +3,20 @@ import { v4 as uuid } from 'uuid'
 
 enum TodoActionType {
   ADD_TODO = 'ADD_TODO',
+  TOGGLE_TODO = 'TOGGLE_TODO',
 }
-interface ITodosAction {
-  type: TodoActionType
+type ITodosAction = IAddTodoAction | IToggleTodoAction
+
+interface IAddTodoAction {
+  type: TodoActionType.ADD_TODO
   payload: {
     description: string
+  }
+}
+interface IToggleTodoAction {
+  type: TodoActionType.TOGGLE_TODO
+  payload: {
+    id: string
   }
 }
 
@@ -26,9 +35,10 @@ interface ITodosState {
   items: ITodo[]
 }
 
+type TGroupedTodos = Record<TodoStatus, ITodo[]>
+
 function todosReducer(state: ITodosState, action: ITodosAction) {
-  const { type, payload } = action
-  switch (type) {
+  switch (action.type) {
     case TodoActionType.ADD_TODO:
       return {
         ...state,
@@ -36,40 +46,111 @@ function todosReducer(state: ITodosState, action: ITodosAction) {
           ...state.items,
           {
             id: uuid(),
-            description: payload.description,
+            description: action.payload.description,
             status: TodoStatus.PENDING,
           },
         ],
       }
+
+    case TodoActionType.TOGGLE_TODO: {
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.id === action.payload.id
+            ? {
+                ...item,
+                status:
+                  item.status === TodoStatus.PENDING
+                    ? TodoStatus.COMPLETED
+                    : TodoStatus.PENDING,
+              }
+            : item
+        ),
+      }
+    }
     default:
       return state
   }
 }
 
-const EmptyState = () => <div>You don't have any todos!</div>
+const EmptyState = () => (
+  <div className="mb-6">
+    <p>You don't have any todos.</p>
+    <p>Try adding one using the text box above!</p>
+  </div>
+)
 
-const TodosTable = ({ todos }: { todos: ITodo[] }) => {
+const TodosTable = ({
+  todos,
+  toggleTodo,
+  title,
+}: {
+  todos: ITodo[]
+  toggleTodo: (id: string) => void
+  title: string
+}) => {
+  const handleSubmit = (evt: any) => {
+    evt.preventDefault()
+  }
+
   return (
-    <table data-cy="todo-list" className="table is-striped is-fullwidth">
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th className="has-text-right">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {todos.map((todo) => (
-          <Todo key={todo.id} {...{ todo }} />
-        ))}
-      </tbody>
-    </table>
+    <form onSubmit={handleSubmit}>
+      <div className="has-text-left mb-6">
+        <h2 className="title is-4">{title}</h2>
+        {!todos?.length && <div>No {title.toLowerCase()} todos to display</div>}
+        {!!todos?.length && (
+          <table
+            data-cy="todo-list"
+            className="table is-striped is-fullwidth is-narrow"
+          >
+            <thead>
+              <tr className="is-sr-only">
+                <th>status</th>
+                <th>description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {todos.map((todo) => (
+                <Todo
+                  key={`${todo.status}-${todo.id}`}
+                  {...{ todo, toggleTodo }}
+                />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </form>
   )
 }
 
-const Todo = ({ todo }: { todo: ITodo }) => (
+const Todo = ({
+  todo,
+  toggleTodo,
+}: {
+  todo: ITodo
+  toggleTodo: (id: string) => void
+}) => (
   <tr>
-    <td className="has-text-left">{todo.description}</td>
-    <td className="has-text-right">{todo.status}</td>
+    <td style={{ width: 30 }}>
+      <div className="field">
+        <div className="control">
+          <label className="is-sr-only" htmlFor={`status-${todo.id}`}>
+            Completed
+          </label>
+          <input
+            type="checkbox"
+            data-cy={`todo-input-toggle-${todo.id}`}
+            className="checkbox"
+            id={`status-${todo.id}`}
+            name={`status-${todo.id}`}
+            onChange={() => toggleTodo(todo.id)}
+            checked={todo.status === TodoStatus.COMPLETED}
+          />
+        </div>
+      </div>
+    </td>
+    <td>{todo.description}</td>
   </tr>
 )
 
@@ -116,13 +197,37 @@ const Todos = () => {
 
   const addTodo = (description: string) =>
     dispatch({ type: TodoActionType.ADD_TODO, payload: { description } })
+  const toggleTodo = (id: string) =>
+    dispatch({ type: TodoActionType.TOGGLE_TODO, payload: { id } })
+
+  const groupedTodos = todos.reduce<TGroupedTodos>((todos, todo) => {
+    const exisitingGroup = todos[todo.status] || []
+    return {
+      ...todos,
+      [todo.status]: [...exisitingGroup, todo],
+    }
+  }, {} as TGroupedTodos)
 
   return (
     <div className="columns is-centered">
       <div className="column is-6">
         <TodoForm {...{ addTodo }} />
-        {!todos.length && <EmptyState />}
-        {!!todos.length && <TodosTable {...{ todos }} />}
+        {!todos?.length && <EmptyState />}
+        <TodosTable
+          {...{
+            todos: groupedTodos[TodoStatus.PENDING],
+            toggleTodo,
+            title: 'Pending',
+          }}
+        />
+
+        <TodosTable
+          {...{
+            todos: groupedTodos[TodoStatus.COMPLETED],
+            toggleTodo,
+            title: 'Complete',
+          }}
+        />
       </div>
     </div>
   )

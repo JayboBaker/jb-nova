@@ -77,8 +77,27 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 ## Developer notes
 
-- First story didn't follow YAGNI: the requirements mentioned todo data that couldn't be rendered to the screen. Would have likely either included an example todo, instead of an empty list, or included the todo statuses as part of the 2nd story. For this reason, I didn't included any tests for the todo statuses or rendering of todos as there wasn't any way to accomplish this via the UI.
+- First story didn't follow YAGNI: the requirements mentioned todo data that couldn't be rendered to the screen. Would have likely either included an example todo, instead of an empty list, or included the todo statuses as part of the 2nd story. For this reason, I didn't included any tests for the todo statuses or rendering of todos for this story as there wasn't any way to accomplish/test this via the UI.
+- Ran out of time to add test coverage for the last story
+- Considered redux as I'm aware NovaFori use it, but the requirement of limiting libs meant I went with react only
+- Would normally use something like immer or immutablejs to ensure immutability when updating the reducer
 
-### TODOs
+### Assumptions
 
+- Targeting modern browsers
+
+### Outstanding
+
+- Break down Todos component
+- Add test coverage for:
+- toggle todo state
+- grouping of todos
+- Add axe accessiblity tool
 - Update packages as cra template is a little out of date and getting a warning in jest tests
+
+### Possible next steps
+
+- Edit todos
+- Delete todos
+- Add date created
+- Add tabs for status groups

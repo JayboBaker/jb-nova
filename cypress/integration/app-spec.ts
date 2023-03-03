@@ -17,7 +17,6 @@ describe('App', function () {
   })
 
   it('ensures there is a description', function () {
-    const todoText = 'oo'
     cy.get('[data-cy="todo-input-description"]').type('{enter}')
     cy.get('[data-cy="todo-list"]').should('not.exist')
   })
