@@ -77,4 +77,8 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 ## Developer notes
 
+- First story didn't follow YAGNI: the requirements mentioned todo data that couldn't be rendered to the screen. Would have likely either included an example todo, instead of an empty list, or included the todo statuses as part of the 2nd story. For this reason, I didn't included any tests for the todo statuses or rendering of todos as there wasn't any way to accomplish this via the UI.
+
+### TODOs
+
 - Update packages as cra template is a little out of date and getting a warning in jest tests
