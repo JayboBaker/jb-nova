@@ -96,7 +96,10 @@ const TodosTable = ({
   return (
     <form onSubmit={handleSubmit}>
       <div className="has-text-left mb-6">
-        <h2 className="title is-4">{title}</h2>
+        <h2 className="title is-4">
+          {title}
+          <span className="is-sr-only"> todos</span>
+        </h2>
         {!todos?.length && <div>No {title.toLowerCase()} todos to display</div>}
         {!!todos?.length && (
           <table
@@ -133,24 +136,19 @@ const Todo = ({
 }) => (
   <tr>
     <td style={{ width: 30 }}>
-      <div className="field">
-        <div className="control">
-          <label className="is-sr-only" htmlFor={`status-${todo.id}`}>
-            Completed
-          </label>
-          <input
-            type="checkbox"
-            data-cy={`todo-input-toggle-${todo.id}`}
-            className="checkbox"
-            id={`status-${todo.id}`}
-            name={`status-${todo.id}`}
-            onChange={() => toggleTodo(todo.id)}
-            checked={todo.status === TodoStatus.COMPLETED}
-          />
-        </div>
-      </div>
+      <input
+        type="checkbox"
+        data-cy={`todo-input-toggle-${todo.id}`}
+        className="checkbox"
+        id={`status-${todo.id}`}
+        name={`status-${todo.id}`}
+        onChange={() => toggleTodo(todo.id)}
+        checked={todo.status === TodoStatus.COMPLETED}
+      />
     </td>
-    <td>{todo.description}</td>
+    <td>
+      <label htmlFor={`status-${todo.id}`}>{todo.description}</label>
+    </td>
   </tr>
 )
 
