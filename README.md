@@ -38,18 +38,22 @@ npm i && npm run dev
 ### Outstanding
 
 - Break down Todos component
+- Add sensible limit to todo description length
 - Add test coverage for:
-- toggle todo state
-- grouping of todos
+  - toggle todo state
+  - grouping of todos
 - Add axe accessiblity tool
 - Update packages as cra template is a little out of date and getting a warning in jest tests
 
 ### Possible next steps
 
+- Persist todos
 - Edit todos
 - Delete todos
 - Add date created
 - Add tabs for status groups
+- Search todos
+- Add pagination
 
 ## Available Scripts
 
